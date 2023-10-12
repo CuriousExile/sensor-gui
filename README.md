@@ -51,7 +51,18 @@ $ python manage.py createsuperuser
 $ python manage.py runserver
 ```
 
-At this point, the app runs at `http://127.0.0.1:8000/`. 
+At this point, the app runs at `http://127.0.0.1:8000/`.
+
+
+> 👉 Alternative: Start the app inside the network
+   > 👉 Add your IP to core/settings.py in 'ALLOWED_HOSTS'
+   > 👉 Start the app
+
+```bash
+$ python manage.py runserver 192.168.x.x:8000
+```
+
+At this point, the app runs at `http://192.168.x.x:8000/`. 
 
 <br />
 
