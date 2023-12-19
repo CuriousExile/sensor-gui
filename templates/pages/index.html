@@ -23,6 +23,7 @@
         <div class="row mt-4 main">
         <div class="col-lg-3">
           <div class="card text-center">
+          <!--
             <div class="card-body p-3">
                 
                 <h5>Last Measurement</h5>
@@ -67,6 +68,7 @@
                 <span class="btn-inner--text">Pull</span>
               </button>
             </div>
+          -->
           </div>
         </div>
       </div>
@@ -92,11 +94,11 @@
                 </div>
                 <div class="form-group">
                   <label for="example-time-input" class="form-control-label">Start Time</label>
-                  <input class="form-control" type="time" value="09:00:00" id="example-time-input">
+                  <input class="form-control" type="time" value="09:00:00" id="start-time-input">
                 </div>
                 <div class="form-group">
                   <label for="example-time-input" class="form-control-label">End Time</label>
-                  <input class="form-control" type="time" value="15:00:00" id="example-time-input">
+                  <input class="form-control" type="time" value="15:00:00" id="end-time-input">
                 </div>                           
               </form>
               <button class="btn btn-icon btn-3 btn-primary" id="setApplyBtn" type="button">
@@ -325,8 +327,18 @@
     gradientStroke2.addColorStop(1, 'rgba(20,23,39,0.2)');
     gradientStroke2.addColorStop(0.2, 'rgba(72,72,176,0.0)');
     gradientStroke2.addColorStop(0, 'rgba(20,23,39,0)'); //purple colors
+    function fetchDataAndUpdateChart(chartContext) {
+    fetchData()
+        .then(temperatureValues => {
+            console.log('Temperature Values:', temperatureValues);
+            updateChartWithTemperatureValues(chartContext, temperatureValues);
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+        });
+}
 
-    new Chart(ctx2, {
+const myChart = new Chart(ctx2, {
       type: "line",
       data: {
         labels: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"],
@@ -409,6 +421,118 @@
         $("#temperaturDataCard").hide();
       }
     });
+
+    function generateTimeFrameUrl(apiUrl, startDate, endDate) {
+      
+      var endpoint = "/v1/temperature/range";
+      var params = {
+          start_date: startDate,
+          end_date: endDate
+      };
+
+      // Baue die vollständige URL unter Verwendung von URLSearchParams
+      var url = new URL(endpoint, apiUrl);
+      url.search = new URLSearchParams(params).toString();
+
+      return url.toString();
+    }
+
+    function getTemperatureValues(jsonData) {
+      console.log("hey " + jsonData)
+      const dataArray = JSON.parse(jsonData);
+      console.log("hey " + dataArray)
+      // Check if the input is an array
+      if (!Array.isArray(dataArray)) {
+        throw new Error('Input is not an array');
+      }
+
+      // Extract temperature values from each object in the array
+      const temperatureValues = dataArray.map(obj => obj.temperature);
+      return temperatureValues;
+    }
+
+    function getTimeValues(jsonData) {
+  const dataArray = JSON.parse(jsonData);
+
+  if (!Array.isArray(dataArray)) {
+    throw new Error('Input is not an array');
+  }
+
+  // Extract time values from each object in the array
+  const timeValues = dataArray.map(obj => {
+    const timestamp = new Date(obj.timestamp);
+    const hours = timestamp.getHours();
+    const minutes = timestamp.getMinutes();
+    const seconds = timestamp.getSeconds();
+
+    // Format the time as HH:MM:SS
+    const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    return formattedTime;
+  });
+
+  return timeValues;
+}
+
+function fetchData() {
+    return new Promise((resolve, reject) => {
+        // Replace 'https://api.example.com/endpoint' with your actual API endpoint
+        var dateInput = document.getElementById("example-date-input").value;
+        var startTimeInput = document.getElementById("start-time-input").value;
+        var endTimeInput = document.getElementById("end-time-input").value;
+        var baseUrl = "http://85.215.54.228:8004";
+        var startDate = dateInput + "T" + startTimeInput;
+        var endDate = dateInput + "T" + endTimeInput;
+        const apiUrl = generateTimeFrameUrl(baseUrl, startDate, endDate);
+
+        let data; // Declare the data variable here
+
+        // Make a GET request to the API endpoint
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status} for URL: ${apiUrl}`);
+                }
+                return response.json();
+            })
+            .then(parsedData => {
+                data = parsedData; // Assign the parsed data to the variable
+                // Extract time values
+                const timeValues = getTimeValues(JSON.stringify(data));
+                // Resolve the promise with both temperature and time values
+                resolve({ temperatureValues: getTemperatureValues(JSON.stringify(data)), timeValues });
+            })
+            .catch(error => {
+                reject(error);
+            });
+    });
+}
+
+    function updateChartWithTemperatureValues(chart, temperatureValues, timeValues) {
+        // Update the chart's dataset with the new temperature values
+        chart.data.labels = timeValues; // Update labels with timestamps
+        chart.data.datasets[0].data = temperatureValues;
+        chart.update();
+    }
+
+// Example usage:
+
+      const buttonX = document.getElementById('setApplyBtn');
+
+      // Attach the fetchData function to the button's click event
+      buttonX.addEventListener('click', () => {
+        fetchData()
+            .then(({ temperatureValues, timeValues }) => {
+                console.log('Temperature Values:', temperatureValues);
+                console.log('Time Values:', timeValues);
+                // Perform further actions with temperatureValues and timeValues as needed
+                updateChartWithTemperatureValues(myChart, temperatureValues, timeValues);
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
+    });
+
   </script>
 
 {% endblock scripts %}

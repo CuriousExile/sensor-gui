@@ -2,6 +2,7 @@ django
 gunicorn
 python-dotenv
 whitenoise
+requests
 django-admin-soft-dashboard==1.0.12
 
 # psycopg2-binary
