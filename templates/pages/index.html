@@ -94,7 +94,7 @@
                 </div>
                 <div class="form-group">
                   <label for="example-time-input" class="form-control-label">Start Time</label>
-                  <input class="form-control" type="time" value="09:00:00" id="start-time-input">
+                  <input class="form-control" type="time" value="08:00:00" id="start-time-input">
                 </div>
                 <div class="form-group">
                   <label for="example-time-input" class="form-control-label">End Time</label>
@@ -208,7 +208,7 @@
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex px-2 py-1">
                             <div class="d-flex flex-column justify-content-center">
-                              <h6 class="mb-0 text-xs">24.8 °C</h6>
+                              <h6 class="mb-0 text-xs">34.8 °C</h6>
                             </div>
                           </div>
                         </div>
@@ -231,7 +231,7 @@
                         <div class="d-flex px-2 py-1">
                           <div class="d-flex px-2 py-1">
                             <div class="d-flex flex-column justify-content-center">
-                              <h6 class="mb-0 text-xs">22.1 °C</h6>
+                              <h6 class="mb-0 text-xs">32.1 °C</h6>
                             </div>
                           </div>
                         </div>
@@ -313,6 +313,13 @@
 
   <script src="{% static 'js/plugins/chartjs.min.js' %}"></script>
   <script>
+
+      window.onload = function () {
+          var today = new Date().toISOString().split('T')[0];
+          document.getElementById('example-date-input').value = today;
+          
+          buttonX.click();
+      };
 
     var ctx2 = document.getElementById("chart-line").getContext("2d");
 
@@ -480,7 +487,7 @@ function fetchData() {
         var dateInput = document.getElementById("example-date-input").value;
         var startTimeInput = document.getElementById("start-time-input").value;
         var endTimeInput = document.getElementById("end-time-input").value;
-        var baseUrl = "http://85.215.54.228:8004";
+        var baseUrl = "http://172.20.177.206:8000";
         var startDate = dateInput + "T" + startTimeInput;
         var endDate = dateInput + "T" + endTimeInput;
         const apiUrl = generateTimeFrameUrl(baseUrl, startDate, endDate);
