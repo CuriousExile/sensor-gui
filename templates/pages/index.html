@@ -350,7 +350,7 @@ const myChart = new Chart(ctx2, {
       data: {
         labels: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00"],
         datasets: [{
-            label: "172.20.178.32",
+            label: "Raspberry PI",
             tension: 0.4,
             borderWidth: 0,
             pointRadius: 0,
@@ -487,7 +487,7 @@ function fetchData() {
         var dateInput = document.getElementById("example-date-input").value;
         var startTimeInput = document.getElementById("start-time-input").value;
         var endTimeInput = document.getElementById("end-time-input").value;
-        var baseUrl = "http://172.20.177.206:8000";
+        var baseUrl = "http://localhost:8001";
         var startDate = dateInput + "T" + startTimeInput;
         var endDate = dateInput + "T" + endTimeInput;
         const apiUrl = generateTimeFrameUrl(baseUrl, startDate, endDate);
